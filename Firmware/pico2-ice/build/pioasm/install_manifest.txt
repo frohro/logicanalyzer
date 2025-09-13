@@ -1,0 +1,5 @@
+/home/frohro/Classes/Digital_Design/logicanalyzer/Firmware/pico2-ice/build/pioasm-install/pioasm/pioasm
+/home/frohro/Classes/Digital_Design/logicanalyzer/Firmware/pico2-ice/build/pioasm-install/pioasm/pioasmTargets.cmake
+/home/frohro/Classes/Digital_Design/logicanalyzer/Firmware/pico2-ice/build/pioasm-install/pioasm/pioasmTargets-release.cmake
+/home/frohro/Classes/Digital_Design/logicanalyzer/Firmware/pico2-ice/build/pioasm-install/pioasm/pioasmConfig.cmake
+/home/frohro/Classes/Digital_Design/logicanalyzer/Firmware/pico2-ice/build/pioasm-install/pioasm/pioasmConfigVersion.cmake
