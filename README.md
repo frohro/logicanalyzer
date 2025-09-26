@@ -1,5 +1,36 @@
 # LogicAnalyzer
 
+## 🎓 For Students (frohro's Digital Design Class)
+
+**Welcome!** This repository contains the complete LogicAnalyzer project with **pico2-ice support** for your FPGA development work.
+
+### Quick Start for pico2-ice/pico-ice Users
+
+📖 **Documentation:**
+- **[pico2-ice Setup Guide](Firmware/LogicAnalyzer_V2/pico2-ice-readme.md)** - Complete guide for RP2350B-based pico2-ice
+- **[pico-ice Setup Guide](Firmware/LogicAnalyzer_V2/pico-ice-readme.md)** - Complete guide for RP2040-based pico-ice
+
+🚀 **Quick Build:**
+```bash
+cd Firmware/LogicAnalyzer_V2
+# For pico2-ice:
+cmake -DBOARD_TYPE=BOARD_PICO2_ICE .
+make -j8
+
+# For pico-ice:
+cmake -DBOARD_TYPE=BOARD_PICO_ICE .  
+make -j8
+```
+
+📋 **Key Features:**
+- ✅ **Both pico-ice AND pico2-ice supported**
+- ✅ **Immediate FPGA clock start** (no CDONE dependency issues)
+- ✅ **24 channels** of logic analysis at up to 100 Msps
+- ✅ **FPGA debugging ready** - perfect for your FPGA projects!
+- ✅ **Comprehensive documentation** and troubleshooting guides
+
+---
+
 ## About the project
 
 This README is organized as a log of the evolution of the project and for now it will stay like this.
