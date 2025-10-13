@@ -74,25 +74,37 @@ The Logic Analyzer can monitor these GPIO pins:
 - **GPIO20-GPIO43** - High-speed I/O range (excluding conflicting pins)
 
 **Channel to GPIO Pin Mapping:**
-```
-Logic Analyzer Channel → GPIO Pin
-Channel 0  → GPIO20   Channel 12 → GPIO32
-Channel 1  → GPIO21 (FPGA Clock) 🕐   Channel 13 → GPIO33
-Channel 2  → GPIO22   Channel 14 → GPIO34
-Channel 3  → GPIO23   Channel 15 → GPIO35
-Channel 4  → GPIO24   Channel 16 → GPIO36
-Channel 5  → GPIO25   Channel 17 → GPIO37
-Channel 6  → GPIO26   Channel 18 → GPIO38
-Channel 7  → GPIO27   Channel 19 → GPIO39
-Channel 8  → GPIO28   Channel 20 → GPIO40 (CDONE) 📡
-Channel 9  → GPIO29   Channel 21 → GPIO41
-Channel 10 → GPIO30   Channel 22 → GPIO42
-Channel 11 → GPIO31 (CRESETN) 🔄   Channel 23 → GPIO43
 
-Note: 🕐 = 10MHz FPGA clock output
-📡 = FPGA configuration done status (unreliable voltage)
+| Channel | GPIO Pin | Notes |
+|---------|----------|-------|
+| 0 | GPIO20 | |
+| 1 | GPIO21 | FPGA Clock 🕐 |
+| 2 | GPIO22 | |
+| 3 | GPIO23 | |
+| 4 | GPIO24 | |
+| 5 | GPIO25 | |
+| 6 | GPIO26 | |
+| 7 | GPIO27 | |
+| 8 | GPIO28 | |
+| 9 | GPIO29 | |
+| 10 | GPIO30 | |
+| 11 | GPIO31 | FPGA reset control (active-low) 🔄 |
+| 12 | GPIO32 | |
+| 13 | GPIO33 | |
+| 14 | GPIO34 | |
+| 15 | GPIO35 | |
+| 16 | GPIO36 | |
+| 17 | GPIO37 | |
+| 18 | GPIO38 | |
+| 19 | GPIO39 | |
+| 20 | GPIO40 | FPGA configuration done status (unreliable voltage) 📡 |
+| 21 | GPIO41 | |
+| 22 | GPIO42 | |
+| 23 | GPIO43 | |
+
+Note: 🕐 = 10MHz FPGA clock output  
+📡 = FPGA configuration done status (unreliable voltage)  
 🔄 = FPGA reset control (active-low)
-```
 
 **Important Notes:**
 - **Channel 1** (GPIO21) shows the 10MHz FPGA clock - useful for timing reference
