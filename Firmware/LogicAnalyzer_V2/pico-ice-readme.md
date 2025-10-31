@@ -100,7 +100,8 @@ Note: 🕐 = 10MHz FPGA clock output
 📡 = FPGA configuration done status  
 🔄 = FPGA reset control (active-low)
 ```
-
+**Complex Triggering**
+Note:  GPIO0 and GPIO1 must be jumpered if you want to use COMPLEX triggering (triggering on a pattern).  You can change these LogicAnalyzer_Board_Settings.h if you want other pins on the RP2350B.
 **Important Notes:**
 - **Channels 17, 19, 20** (GPIO24, 26, 27) have special FPGA functions but can still be monitored
 - **GPIO24** shows the 10MHz FPGA clock - useful for timing reference
