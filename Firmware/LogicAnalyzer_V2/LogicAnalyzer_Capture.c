@@ -645,11 +645,13 @@ bool StartCaptureFast(uint32_t freq, uint32_t preLength, uint32_t postLength, co
     capturePIO = pio1; //Cannot clear it in PIO1 because the W uses PIO1 to transfer data
     triggerPIO = pio0;
 
-    pio_clear_instruction_memory(triggerPIO);
 
+    pio_clear_instruction_memory(triggerPIO);
+    // pio_set_gpio_base(triggerPIO, PIO_GPIO_BASE);
+    pio_set_gpio_base(capturePIO, PIO_GPIO_BASE);
     //Configure MAX_CHANNELS + 2 IO's to be used by the PIO (MAX_CHANNELS channels + 2 trigger pins)
-    pio_gpio_init(triggerPIO, COMPLEX_TRIGGER_OUT_PIN);
-    pio_gpio_init(capturePIO, COMPLEX_TRIGGER_IN_PIN);
+    // pio_gpio_init(triggerPIO, COMPLEX_TRIGGER_OUT_PIN);
+    // pio_gpio_init(capturePIO, COMPLEX_TRIGGER_IN_PIN);
 
     for(uint8_t i = 0; i < MAX_CHANNELS; i++)
     {
@@ -829,6 +831,9 @@ bool StartCaptureComplex(uint32_t freq, uint32_t preLength, uint32_t postLength,
     //Store the PIO unit and clear program memory
     capturePIO = pio0;
     pio_clear_instruction_memory(capturePIO);
+    pio_set_gpio_base(capturePIO, PIO_GPIO_BASE); //Set GPIO base to 16 to avoid conflicts with the W PIO0 usage
+
+
 
     //Configure MAX_CHANNELS + 2 IO's to be used by the PIO (MAX_CHANNELS channels + 2 trigger pins)
     pio_gpio_init(capturePIO, COMPLEX_TRIGGER_OUT_PIN);
@@ -1011,6 +1016,7 @@ bool StartCaptureBlast(uint32_t freq, uint32_t length, const uint8_t* capturePin
     //Store the PIO unit and clear program memory
     capturePIO = pio0;
     pio_clear_instruction_memory(capturePIO);
+    pio_set_gpio_base(capturePIO, PIO_GPIO_BASE); //Set GPIO base to 16 to avoid conflicts with the W PIO0 usage
 
     //Configure capture SM
     sm_Capture = pio_claim_unused_sm(capturePIO, true);
@@ -1159,6 +1165,7 @@ bool StartCaptureSimple(uint32_t freq, uint32_t preLength, uint32_t postLength, 
     //Store the PIO unit and clear program memory
     capturePIO = pio0;
     pio_clear_instruction_memory(capturePIO);
+    pio_set_gpio_base(capturePIO, PIO_GPIO_BASE); //Set GPIO base to 16 to avoid conflicts with the W PIO0 usage
 
     //Configure capture SM
     sm_Capture = pio_claim_unused_sm(capturePIO, true);

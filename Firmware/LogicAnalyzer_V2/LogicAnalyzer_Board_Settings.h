@@ -63,6 +63,7 @@
     #if defined (BUILD_PICO)
 
         #define BOARD_NAME "PICO"
+        #define PIO_GPIO_BASE 0
         #define SUPPORTS_COMPLEX_TRIGGER
         #define INPUT_PIN_BASE 2
         #define COMPLEX_TRIGGER_OUT_PIN 0
@@ -84,6 +85,7 @@
     #elif defined (BUILD_PICO_2)
 
         #define BOARD_NAME "PICO_2"
+        #define PIO_GPIO_BASE 0
         #define SUPPORTS_COMPLEX_TRIGGER
         #define INPUT_PIN_BASE 2
         #define COMPLEX_TRIGGER_OUT_PIN 0
@@ -105,6 +107,7 @@
     #elif defined (BUILD_PICO_W)
 
         #define BOARD_NAME "W"
+        #define PIO_GPIO_BASE 0
         #define SUPPORTS_COMPLEX_TRIGGER
         #define INPUT_PIN_BASE 2
         #define COMPLEX_TRIGGER_OUT_PIN 0
@@ -120,6 +123,7 @@
     #elif defined (BUILD_PICO_W_WIFI)
 
         #define BOARD_NAME "WIFI"
+        #define PIO_GPIO_BASE 0
         #define SUPPORTS_COMPLEX_TRIGGER
         #define INPUT_PIN_BASE 2
         #define COMPLEX_TRIGGER_OUT_PIN 0
@@ -135,6 +139,7 @@
     #elif defined (BUILD_PICO_2_W)
 
         #define BOARD_NAME "2_W"
+        #define PIO_GPIO_BASE 0
         #define SUPPORTS_COMPLEX_TRIGGER
         #define INPUT_PIN_BASE 2
         #define COMPLEX_TRIGGER_OUT_PIN 0
@@ -150,6 +155,7 @@
     #elif defined (BUILD_PICO_2_W_WIFI)
 
         #define BOARD_NAME "2_WIFI"
+        #define PIO_GPIO_BASE 0
         #define SUPPORTS_COMPLEX_TRIGGER
         #define INPUT_PIN_BASE 2
         #define COMPLEX_TRIGGER_OUT_PIN 0
@@ -165,6 +171,7 @@
     #elif defined (BUILD_ZERO)
 
         #define BOARD_NAME "ZERO"
+        #define PIO_GPIO_BASE 0
         #define SUPPORTS_COMPLEX_TRIGGER
         #define INPUT_PIN_BASE 0
         #define COMPLEX_TRIGGER_OUT_PIN 17
@@ -186,6 +193,7 @@
     #elif defined (BUILD_INTERCEPTOR)
 
         #define BOARD_NAME "INTERCEPTOR"
+        #define PIO_GPIO_BASE 0
         #define SUPPORTS_COMPLEX_TRIGGER
         #define INPUT_PIN_BASE 2
         #define COMPLEX_TRIGGER_OUT_PIN 0
@@ -206,6 +214,7 @@
     #elif defined (BUILD_PICO_ICE)
 
         #define BOARD_NAME "PICO_ICE"
+        #define PIO_GPIO_BASE 0
         #define SUPPORTS_COMPLEX_TRIGGER
         #define INPUT_PIN_BASE 0
         #define COMPLEX_TRIGGER_OUT_PIN 0  // You can connect ICE_27 to ICE_25 if you want complex trigger.
@@ -240,12 +249,14 @@
 
         #define BOARD_NAME "PICO2_ICE"
         #define SUPPORTS_COMPLEX_TRIGGER
+        #define PIO_GPIO_BASE 16        // PIO window starts at GPIO16 for accessing GPIO20-43
         #define INPUT_PIN_BASE 20
-        #define COMPLEX_TRIGGER_OUT_PIN 2 // GPIO0 and GPIO1 are not connected to headers.
-        #define COMPLEX_TRIGGER_IN_PIN 3
+        #define COMPLEX_TRIGGER_OUT_PIN 45 
+        #define COMPLEX_TRIGGER_IN_PIN 46
         #define GPIO_LED
         #define LED_IO 0  // Use green LED (RGB LED - green component)
         #define PIN_MAP {20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,COMPLEX_TRIGGER_IN_PIN}
+
 
         // FPGA control pins for pico2-ice
         #define PIN_FPGA_CRESETN 31  // CRESET_B (active-low)
