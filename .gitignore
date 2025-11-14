@@ -386,3 +386,6 @@ logicanalyzer.wiki/
 Old/
 Electronics/LogicAnalyzer/LogicAnalyzerPro*/
 Electronics/LogicAnalyzer/LogicAnalyzerV2/packages/
+
+# VS Code settings
+.vscode/
