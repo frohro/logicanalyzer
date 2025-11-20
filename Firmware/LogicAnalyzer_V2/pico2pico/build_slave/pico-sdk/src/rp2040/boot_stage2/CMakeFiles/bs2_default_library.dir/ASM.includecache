@@ -1,0 +1,10 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/frohro/Classes/Digital_Design/try_5/logicanalyzer/Firmware/LogicAnalyzer_V2/pico2pico/build_slave/pico-sdk/src/rp2040/boot_stage2/bs2_default_padded_checksummed.S
+

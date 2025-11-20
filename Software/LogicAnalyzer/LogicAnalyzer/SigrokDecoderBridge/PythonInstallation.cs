@@ -17,11 +17,8 @@ ver = str(sys.version_info.major) + str(sys.version_info.minor);
 path = sys.exec_prefix;
 print(op.join(path, 'Python' + ver + '.dll'));";
 
-        const string linuxPyScript = @"import os.path as op;
-try:
-    from distutils import sysconfig;
-except:
-    import sysconfig;
+        const string linuxPyScript = @"from distutils import sysconfig;
+import os.path as op;
 v = sysconfig.get_config_vars();
 fpaths = [op.join(v[pv], v['LDLIBRARY']) for pv in ('LIBDIR', 'LIBPL')]; 
 print(list(filter(op.exists, fpaths))[0])";

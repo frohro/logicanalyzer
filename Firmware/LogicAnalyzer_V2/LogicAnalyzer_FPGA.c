@@ -111,7 +111,7 @@ bool fpga_start_clock(void)
     // Each loop is 2 instructions; with sideset toggling each instr, period = 2 cycles
     // f_out = f_sys / (clkdiv * 2) => clkdiv = f_sys / (f_out*2)
     float system_freq = (float)clock_get_hz(clk_sys);
-    float target_freq = 10000000.0f;  // 10 MHz
+    float target_freq = FPGA_CLOCK_FREQUENCY;
     float clkdiv = system_freq / (target_freq * 2.0f);
     sm_config_set_clkdiv(&c, clkdiv);
 

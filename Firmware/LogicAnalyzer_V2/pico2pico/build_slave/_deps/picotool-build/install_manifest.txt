@@ -1,0 +1,7 @@
+/home/frohro/Classes/Digital_Design/try_5/logicanalyzer/Firmware/LogicAnalyzer_V2/pico2pico/build_slave/_deps/picotool/picotool
+/home/frohro/Classes/Digital_Design/try_5/logicanalyzer/Firmware/LogicAnalyzer_V2/pico2pico/build_slave/_deps/picotool/picotoolTargets.cmake
+/home/frohro/Classes/Digital_Design/try_5/logicanalyzer/Firmware/LogicAnalyzer_V2/pico2pico/build_slave/_deps/picotool/picotoolTargets-release.cmake
+/home/frohro/Classes/Digital_Design/try_5/logicanalyzer/Firmware/LogicAnalyzer_V2/pico2pico/build_slave/_deps/picotool/picotoolConfig.cmake
+/home/frohro/Classes/Digital_Design/try_5/logicanalyzer/Firmware/LogicAnalyzer_V2/pico2pico/build_slave/_deps/picotool/picotoolConfigVersion.cmake
+/home/frohro/Classes/Digital_Design/try_5/logicanalyzer/Firmware/LogicAnalyzer_V2/pico2pico/build_slave/_deps/picotool/enc_bootloader.elf
+/home/frohro/Classes/Digital_Design/try_5/logicanalyzer/Firmware/LogicAnalyzer_V2/pico2pico/build_slave/_deps/picotool/enc_bootloader_mbedtls.elf
