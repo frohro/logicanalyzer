@@ -1,9 +1,58 @@
 # LogicAnalyzer
 
-## Downloads
-You can find all the compiled projects in the [Releases section](https://github.com/gusmanb/logicanalyzer/releases).
+## About the project
 
-Latest version: Release 5.1.0.0, 05/05/2024
+This README is organized as a log of the evolution of the project and for now it will stay like this.
+If you are new to the project and want to know what is this about you can start [here](https://github.com/gusmanb/logicanalyzer?tab=readme-ov-file#description)
+or reading [the wiki](https://github.com/gusmanb/logicanalyzer/wiki).
+
+Beware, the documentation is a bit outdated, I will try this summer to upgrade everything.
+
+## Orders
+- Direct order (based on availability): https://logicanalyzer.rf.gd (right now orders are not accepted)
+- PCBWay order: https://www.pcbway.com/project/shareproject/LogicAnalyzer_V6_0_cc383781.html
+
+## Enclosure
+- @Bravo13 has created a pretty cool enclosure for V6.0, you can order it [here](https://www.pcbway.com/project/shareproject/Enclosure_for_LogicAnalyzer_V6_0_b82ed490.html)
+
+## Downloads
+- You can find all the compiled projects in the [Releases section](https://github.com/gusmanb/logicanalyzer/releases).
+- Latest version: Release 6.0.0.1, 09/02/2025
+
+# Beta 6.5 available
+
+Wanna try the next version? Check [this discussion](https://github.com/gusmanb/logicanalyzer/discussions/277) :)
+
+# ZX Spectrum analyzer by Happy Little Diodes!
+
+If you are into retro computing and more specifically the ZX Spectrum, you should check this video by Happy Little Diodes.
+He has developed an interface to connect LogicAnalyzer in a very cool way to the ZX Spectrum.
+
+Don't miss it!
+
+https://www.youtube.com/watch?v=IHbIW8pi4Vo
+
+# Release 6.0 is out!
+
+Finally Release 6.0 is completed and comes with many, many changes!
+
+First, I have uploaded the project to PCBWay, I will still serve orders but as there is too much demand to keep up with it I also have uploaded it as a shared project, so you don't need to wait for me having stock.
+The project is found here: https://www.pcbway.com/project/shareproject/LogicAnalyzer_V6_0_cc383781.html
+It is right now under review so I expect it to be available in a couple of days.
+
+Next, now the gerber files, BOMs and centroid are included in the release packages so you don't need to search inside the projects in case you want to order it from another manufacturer.
+
+That's regarding logistics, now, a brief resume of the changes:
+
+- Pico2 is supported, the new design solves the problems with the IO glitches.
+- Total revamp of the analysis software, including speed up of the rendering, autodetection of the analyzers, and the biggest change, all the Sigrok protocol decoders are supported!
+- New terminal capture application, no more long inhuman command lines, configure the capture using the terminal application and trigger the capture specifying the capture settings file! (use TerminalCapture --help for more info)
+- New All-in-one package, both apps in a single zip if you want to use both!
+- And many, maaaaany more changes.
+
+Next weeks I will update the wiki with updated usage and functionalities, for now if you have doubts read the Discussion section related threads and of course if you need help feel free to open a new thread.
+
+Have fun!
 
 ## Orders
 
@@ -22,16 +71,6 @@ Thanks to everyone, the support that I'm receiving with the project is amazing a
 
 ----
 
-## Building V6.0
-
-### PLEASE DO NOT BUILD MANUALLY V6.0
-
-It is not in the master as it is a work in progress, is not intended to be used as I upload any change that I do and usually contain known problems. If you want to try the V6.0 beta releases download them form this Mega folder, I update it each time I have significant changes.
-
-https://mega.nz/folder/SGxDHAZL#afLGgQbJAaqOYXjhJBwokQ
-
-----
-
 # Back!
 
 Hi. I was in a business trip past weeks and got back today, so I have a ton of emails and messages regarding the project unanswered.
@@ -41,15 +80,6 @@ I will answer all the emails and requests this weekend/next Monday.
 Sorry! :)
 
 ----
-
-# Branches
-
-**Please, do not try to build V6_0 by yourself**
-
-The V6_0 branch is the branch where I'm working on and I found many users that are downloading it and trying to compile it, **don't do it**.
-This branch may be completely broken while I'm doing changes and is not meant to be used by users, the only officially supported branch is the master one, any request regarding other branches will be closed immediatelly.
-
-If you want to test the version 6.0 you can try the latest available [test build](https://github.com/gusmanb/logicanalyzer/discussions?discussions_q=is%3Aopen+test+build).
 
 # Good news
 
@@ -753,3 +783,4 @@ In any case, I will try to get it running in one of my development machines and 
 ---
 
 Have fun!
+
