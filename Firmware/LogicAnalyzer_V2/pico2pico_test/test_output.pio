@@ -1,0 +1,8 @@
+.program test_output
+
+; Output 1 bit from OSR to pin each cycle
+; Autopull refills from TX FIFO
+
+.wrap_target
+    out pins, 1     ; output 1 bit from OSR to pins
+.wrap

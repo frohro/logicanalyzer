@@ -1,0 +1,8 @@
+.program test_capture
+
+; Capture 1 bit from input pin each cycle
+; Autopush will push to RX FIFO
+
+.wrap_target
+    in pins, 1      ; capture 1 bit from pins
+.wrap
