@@ -387,16 +387,16 @@ Old/
 Electronics/LogicAnalyzer/LogicAnalyzerPro*/
 Electronics/LogicAnalyzer/LogicAnalyzerV2/packages/
 
-<<<<<<< Updated upstream
 # VS Code settings
-.vscode/# Local utility scripts
+.vscode/
+
+# Local utility scripts
 Firmware/LogicAnalyzer_V2/flash.sh
 Firmware/LogicAnalyzer_V2/reboot_bootsel.sh
-=======
-# build dircetories
+
+# build directories
 build/
 build_slave/
 _deps/
 **/build/
 **/_deps/
->>>>>>> Stashed changes
