@@ -63,7 +63,7 @@ if(TURBO_MODE)
 endif()
 
 if(NOT DEBUG_BUILD)
-    if((BOARD_TYPE STREQUAL "BOARD_PICO") OR (BOARD_TYPE STREQUAL "BOARD_ZERO") OR (BOARD_TYPE STREQUAL "BOARD_PICO_2") OR (BOARD_TYPE STREQUAL "BOARD_PICO2_ICE"))
+    if((BOARD_TYPE STREQUAL "BOARD_PICO") OR (BOARD_TYPE STREQUAL "BOARD_ZERO") OR (BOARD_TYPE STREQUAL "BOARD_PICO_2") OR (BOARD_TYPE STREQUAL "BOARD_PICO2_ICE") OR (BOARD_TYPE STREQUAL "BOARD_PICO2PICO"))
         message(STATUS "Forcing Release for RAM-only build")
         set(CMAKE_BUILD_TYPE Release)
     endif()
@@ -81,11 +81,13 @@ pico_sdk_init()
 # Add executable. Default name is the project name, version 0.1
 
 FILE(GLOB CSources *.c)
+# Exclude pico2pico_master.c from main LogicAnalyzer build (it has its own target)
+list(FILTER CSources EXCLUDE REGEX ".*pico2pico_master\\.c$")
 ADD_EXECUTABLE(LogicAnalyzer ${CSources})
 
 # Enable ram-only build for the base pico and zero, increases timming precission
 if(NOT DEBUG_BUILD)
-    if((BOARD_TYPE STREQUAL "BOARD_PICO") OR (BOARD_TYPE STREQUAL "BOARD_ZERO") OR (BOARD_TYPE STREQUAL "BOARD_PICO_2") OR (BOARD_TYPE STREQUAL "BOARD_PICO2_ICE"))
+    if((BOARD_TYPE STREQUAL "BOARD_PICO") OR (BOARD_TYPE STREQUAL "BOARD_ZERO") OR (BOARD_TYPE STREQUAL "BOARD_PICO_2") OR (BOARD_TYPE STREQUAL "BOARD_PICO2_ICE") OR (BOARD_TYPE STREQUAL "BOARD_PICO2PICO"))
         message(STATUS "Setting RAM-only compilation")
         pico_set_binary_type(LogicAnalyzer copy_to_ram)
     endif()
@@ -154,6 +156,10 @@ if(BOARD_TYPE STREQUAL "BOARD_PICO2_ICE")
     add_compile_definitions(BUILD_PICO2_ICE)
     add_compile_definitions(CORE_TYPE_2)
 endif()
+if(BOARD_TYPE STREQUAL "BOARD_PICO2PICO")
+    message(STATUS "Configuring for Pico2Pico (state mode with external clock)")
+    add_compile_definitions(BUILD_PICO2PICO)
+endif()
 
 # Add any user requested librariesUna pregu
 target_link_libraries(LogicAnalyzer
@@ -177,3 +183,60 @@ pico_add_extra_outputs(LogicAnalyzer)
 target_include_directories(LogicAnalyzer PRIVATE ${CMAKE_CURRENT_LIST_DIR} )
 
 target_compile_definitions(LogicAnalyzer PUBLIC USBD_MANUFACTURER="Dr. Gusman" USBD_PRODUCT="LogicAnalyzer" USBD_VID=0x1209 USBD_PID=0x3020)
+
+# ============================================================================
+# PICO2PICO Master Test Program (only built for PICO2PICO board)
+# ============================================================================
+if(BOARD_TYPE STREQUAL "BOARD_PICO2PICO")
+    add_executable(pico2pico_master
+        pico2pico_master.c
+    )
+
+    target_link_libraries(pico2pico_master
+        pico_stdlib
+        hardware_clocks
+        hardware_gpio
+        hardware_pio
+        hardware_dma
+    )
+
+    pico_enable_stdio_usb(pico2pico_master 1)
+    pico_enable_stdio_uart(pico2pico_master 0)
+
+    pico_add_extra_outputs(pico2pico_master)
+
+    target_compile_definitions(pico2pico_master PUBLIC 
+        USBD_MANUFACTURER="PICO2PICO" 
+        USBD_PRODUCT="Master" 
+        USBD_VID=0x1209 
+        USBD_PID=0x3021
+    )
+
+    # Flash targets for PICO2PICO
+    # Master is typically on /dev/ttyACM0, Slave on /dev/ttyACM1
+    # Usage: make flash-master or make flash-slave
+    
+    add_custom_target(flash-master
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/flash.sh ${CMAKE_CURRENT_BINARY_DIR}/pico2pico_master.uf2 /dev/ttyACM0
+        DEPENDS pico2pico_master
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Flashing pico2pico_master.uf2 to Master Pico on /dev/ttyACM0"
+    )
+
+    add_custom_target(flash-slave
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/flash.sh ${CMAKE_CURRENT_BINARY_DIR}/LogicAnalyzer.uf2 /dev/ttyACM1
+        DEPENDS LogicAnalyzer
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Flashing LogicAnalyzer.uf2 to Slave Pico on /dev/ttyACM1"
+    )
+
+    # Combined target to flash both (flash master first, wait, then slave)
+    add_custom_target(flash-both
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/flash.sh ${CMAKE_CURRENT_BINARY_DIR}/pico2pico_master.uf2 /dev/ttyACM0
+        COMMAND sleep 5
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/flash.sh ${CMAKE_CURRENT_BINARY_DIR}/LogicAnalyzer.uf2 /dev/ttyACM1
+        DEPENDS pico2pico_master LogicAnalyzer
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Flashing both Master and Slave Picos"
+    )
+endif()

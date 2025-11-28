@@ -26,4 +26,12 @@ uint8_t* GetBuffer(uint32_t* bufferSize, uint32_t* firstSample, CHANNEL_MODE* ca
 volatile uint32_t* GetTimestamps(uint8_t* length);
 void check_fast_interrupt();
 
+#ifdef USE_EXTERNAL_CLOCK
+// External clock functions for PICO2PICO state mode capture
+void initExternalClockInput(void);
+bool switchToExternalClock(uint32_t expectedFreqHz);
+void switchToInternalClock(void);
+uint32_t getExternalClockFreqKHz(void);
+#endif
+
 #endif

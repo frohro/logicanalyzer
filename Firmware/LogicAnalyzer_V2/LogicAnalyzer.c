@@ -623,6 +623,12 @@ int main()
         fpga_init();
     #endif
 
+    #if defined(BUILD_PICO2PICO)
+        // Initialize external clock input for state mode capture
+        // GPIO20 receives clock from master's GPIO21
+        initExternalClockInput();
+    #endif
+
     #if defined (BUILD_PICO_W) || defined (BUILD_PICO_2_W)
         cyw43_arch_init();
     #elif defined (BUILD_PICO_W_WIFI) || defined (BUILD_PICO_2_W_WIFI)

@@ -12,6 +12,12 @@
 #include "hardware/structs/bus_ctrl.h"
 #include "LogicAnalyzer.pio.h"
 
+#ifdef USE_EXTERNAL_CLOCK
+#include "hardware/structs/clocks.h"
+#include "hardware/structs/iobank0.h"
+#include "hardware/regs/pads_bank0.h"
+#endif
+
 #if defined(CORE_TYPE_2)
 #include <RP2350.h>
 #endif
@@ -70,6 +76,126 @@ static uint8_t captureBuffer[CAPTURE_BUFFER_SIZE] __attribute__((aligned(4)));
 #define CAPTURE_TYPE_COMPLEX 1
 #define CAPTURE_TYPE_FAST 2
 #define CAPTURE_TYPE_BLAST 3
+
+//-----------------------------------------------------------------------------
+//--------------External Clock Functions (PICO2PICO State Mode)----------------
+//-----------------------------------------------------------------------------
+#ifdef USE_EXTERNAL_CLOCK
+
+// Track if we're using external clock
+static bool usingExternalClock = false;
+static bool externalClockInitialized = false;
+
+/// @brief Initialize GPIO20 as external clock input (GPIN0)
+/// Call once during startup
+void initExternalClockInput(void)
+{
+    if (externalClockInitialized)
+        return;
+    
+    // Configure GPIO20 as clock input (GPIN0)
+    // Enable input, disable output
+    hw_write_masked(&pads_bank0_hw->io[EXTERNAL_CLOCK_PIN],
+                    PADS_BANK0_GPIO0_IE_BITS,
+                    PADS_BANK0_GPIO0_IE_BITS | PADS_BANK0_GPIO0_OD_BITS);
+    
+    // Set function to GPCK (clock input)
+    iobank0_hw->io[EXTERNAL_CLOCK_PIN].ctrl = GPIO_FUNC_GPCK << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB;
+    
+    externalClockInitialized = true;
+}
+
+/// @brief Switch system clock to external clock input (GPIN0) for state mode capture
+/// @param expectedFreqHz Expected frequency in Hz (for clock_set_reported_hz)
+/// @return true if switch was successful
+bool switchToExternalClock(uint32_t expectedFreqHz)
+{
+    if (usingExternalClock)
+        return true;  // Already on external clock
+    
+    // Make sure external clock input is configured
+    initExternalClockInput();
+    
+    // Check if external clock is present and measure its actual frequency
+    uint32_t ext_freq_khz = frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLKSRC_GPIN0);
+    if (ext_freq_khz < 1000) {
+        // No external clock detected (less than 1 MHz)
+        return false;
+    }
+    
+    // Use the MEASURED external clock frequency, not the GUI-requested frequency
+    // This is critical for correct timing in state mode
+    uint32_t actual_freq_hz = ext_freq_khz * 1000;
+    
+    // Switch clk_sys to clk_ref first (safe intermediate step)
+    // clk_ref runs from XOSC at 12 MHz, always stable
+    hw_clear_bits(&clocks_hw->clk[clk_sys].ctrl, CLOCKS_CLK_SYS_CTRL_SRC_BITS);
+    while (clocks_hw->clk[clk_sys].selected != 1)
+        tight_loop_contents();
+    
+    // Configure GPIN0 as auxiliary source for clk_sys
+    hw_write_masked(&clocks_hw->clk[clk_sys].ctrl,
+                    CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0 << CLOCKS_CLK_SYS_CTRL_AUXSRC_LSB,
+                    CLOCKS_CLK_SYS_CTRL_AUXSRC_BITS);
+    
+    // Set divider to 1 (no division)
+    clocks_hw->clk[clk_sys].div = 1 << CLOCKS_CLK_SYS_DIV_INT_LSB;
+    
+    // Switch clk_sys to use the auxiliary source (GPIN0)
+    hw_set_bits(&clocks_hw->clk[clk_sys].ctrl, 
+                CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX << CLOCKS_CLK_SYS_CTRL_SRC_LSB);
+    while (clocks_hw->clk[clk_sys].selected != 2)
+        tight_loop_contents();
+    
+    // Report the ACTUAL measured clock frequency for correct divider calculations
+    clock_set_reported_hz(clk_sys, actual_freq_hz);
+    
+    usingExternalClock = true;
+    return true;
+}
+
+/// @brief Switch system clock back to internal PLL
+void switchToInternalClock(void)
+{
+    if (!usingExternalClock)
+        return;  // Already on internal clock
+    
+    // Switch clk_sys to clk_ref first (safe intermediate step)
+    hw_clear_bits(&clocks_hw->clk[clk_sys].ctrl, CLOCKS_CLK_SYS_CTRL_SRC_BITS);
+    while (clocks_hw->clk[clk_sys].selected != 1)
+        tight_loop_contents();
+    
+    // Configure PLL_SYS as auxiliary source
+    hw_write_masked(&clocks_hw->clk[clk_sys].ctrl,
+                    CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_PLL_SYS << CLOCKS_CLK_SYS_CTRL_AUXSRC_LSB,
+                    CLOCKS_CLK_SYS_CTRL_AUXSRC_BITS);
+    
+    // Switch clk_sys back to auxiliary source (now PLL_SYS)
+    hw_set_bits(&clocks_hw->clk[clk_sys].ctrl, 
+                CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX << CLOCKS_CLK_SYS_CTRL_SRC_LSB);
+    while (clocks_hw->clk[clk_sys].selected != 2)
+        tight_loop_contents();
+    
+    // Restore reported clock frequency
+    // Default is 125 MHz, 200 MHz for TURBO_MODE, 400 MHz for extreme TURBO
+    #ifdef TURBO_MODE
+        clock_set_reported_hz(clk_sys, 200 * MHZ);
+    #else
+        clock_set_reported_hz(clk_sys, 125 * MHZ);
+    #endif
+    
+    usingExternalClock = false;
+}
+
+/// @brief Check if external clock is available
+/// @return Frequency in kHz, or 0 if not available
+uint32_t getExternalClockFreqKHz(void)
+{
+    initExternalClockInput();
+    return frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLKSRC_GPIN0);
+}
+
+#endif // USE_EXTERNAL_CLOCK
 
 //-----------------------------------------------------------------------------
 //--------------Complex trigger PIO program------------------------------------
@@ -380,6 +506,11 @@ void blast_capture_completed()
     
     pio_remove_program(capturePIO, &BLAST_CAPTURE_program, captureOffset);
 
+    #ifdef USE_EXTERNAL_CLOCK
+    // Switch back to internal clock after capture
+    switchToInternalClock();
+    #endif
+
     //Mark the capture as finished
     captureFinished = true;
 }
@@ -425,6 +556,11 @@ void simple_capture_completed()
         pio_remove_program(capturePIO, &POSITIVE_CAPTURE_program, captureOffset);
     else
         pio_remove_program(capturePIO, &NEGATIVE_CAPTURE_program, captureOffset);
+
+    #ifdef USE_EXTERNAL_CLOCK
+    // Switch back to internal clock after capture
+    switchToInternalClock();
+    #endif
 
     //Mark the capture as finished
     captureFinished = true;
@@ -990,6 +1126,14 @@ bool StartCaptureBlast(uint32_t freq, uint32_t length, const uint8_t* capturePin
     if(triggerPin < 0 || triggerPin > MAX_CHANNELS)
         return false;
 
+    #ifdef USE_EXTERNAL_CLOCK
+    // For PICO2PICO state mode: switch to external clock from master
+    if(!switchToExternalClock(freq)) {
+        // External clock not available - cannot capture in state mode
+        return false;
+    }
+    #endif
+
     //Clear capture buffer (to avoid sending bad data if the trigger happens before the presamples are filled)
     memset(captureBuffer, 0, sizeof(captureBuffer));
 
@@ -1138,6 +1282,15 @@ bool StartCaptureSimple(uint32_t freq, uint32_t preLength, uint32_t postLength, 
     //Incorrect trigger pin?
     if(triggerPin < 0 || triggerPin > MAX_CHANNELS)
         return false;
+
+    #ifdef USE_EXTERNAL_CLOCK
+    // For PICO2PICO state mode: switch to external clock from master
+    // The clock divider calculation will use the external clock frequency
+    if(!switchToExternalClock(freq)) {
+        // External clock not available - cannot capture in state mode
+        return false;
+    }
+    #endif
 
     //Clear capture buffer (to avoid sending bad data if the trigger happens before the presamples are filled)
     memset(captureBuffer, 0, sizeof(captureBuffer));

@@ -283,6 +283,51 @@
         #define CAPTURE_BUFFER_SIZE (128 * 3 * 1024)  // Use larger buffer like other RP2350 boards
         #define MAX_CHANNELS 25
 
+    #elif defined (BUILD_PICO2PICO)
+
+        // PICO2PICO: Two Picos stacked - slave uses master's clock for state mode capture
+        // GPIO20 (GPIN0) receives clock from master's GPIO21 (GPOUT0)
+        // GPIO21 is used for clock input connection, so it's not available for capture
+        // All other GPIOs match between master and slave for direct monitoring
+        
+        #define BOARD_NAME "PICO2PICO"
+        #define PIO_GPIO_BASE 0
+        
+        // State mode: use external clock from master on GPIO20 (GPIN0)
+        #define USE_EXTERNAL_CLOCK
+        #define EXTERNAL_CLOCK_PIN 20   // GPIO20 = GPIN0, receives clock from master GPIO21
+        
+        // No complex trigger - we use simple edge triggering in state mode
+        // Complex trigger would require GPIO0/1 which conflicts with our capture needs
+        // #define SUPPORTS_COMPLEX_TRIGGER
+        
+        #define INPUT_PIN_BASE 2
+        // Note: GPIO0,1 could be used for complex trigger if needed
+        // For now, we don't use them to keep things simple
+        #define COMPLEX_TRIGGER_OUT_PIN 0
+        #define COMPLEX_TRIGGER_IN_PIN 1
+        
+        #define GPIO_LED
+        #define LED_IO 25
+        
+        // Pin map: GPIO2-19, 22-28 (skip 20=clock in, 21=clock jumper to master)
+        // 22 channels total (GPIO2-19 = 18 channels, GPIO22-28 = 6 channels, minus GPIO25=LED = 23 channels)
+        // We include GPIO25 (LED) but it will show LED state, user can ignore it
+        #define PIN_MAP {2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,22,23,24,25,26,27,28,COMPLEX_TRIGGER_IN_PIN}
+
+        // State mode frequencies - matches master's clock speed
+        // The slave samples at whatever clock the master provides
+        // We set these to the expected range (master typically runs at 125-200 MHz)
+        #ifdef TURBO_MODE
+            #define MAX_FREQ 200000000
+            #define MAX_BLAST_FREQ 400000000
+        #else
+            #define MAX_FREQ 100000000
+            #define MAX_BLAST_FREQ 200000000
+        #endif
+        #define CAPTURE_BUFFER_SIZE (128 * 1024)
+        #define MAX_CHANNELS 24
+
     #endif
 
 #endif
