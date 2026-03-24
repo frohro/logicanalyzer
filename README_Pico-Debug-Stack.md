@@ -202,6 +202,56 @@ GPIO 29 and GPIO 30 are **shorted together** on the PCB, so `COMPLEX_TRIGGER_OUT
 
 ---
 
+## TURBO Mode — High-Speed Sampling (up to 400 MHz Blast)
+
+The firmware supports a **TURBO mode** that pushes the RP2354B significantly beyond its rated clock speed.  When enabled, the advertised maximum sample rates become:
+
+| Mode | Normal firmware | TURBO firmware |
+|------|----------------|----------------|
+| Normal capture | 100 MHz | 200 MHz |
+| Blast capture | 200 MHz | **400 MHz** |
+
+> **⚠ Important — Test every board individually.**  TURBO mode is an extreme overclock.  Silicon varies from chip to chip ("silicon lottery").  A sample rate that works reliably on one board may produce corrupt captures or cause a crash on another.  You must characterise each board before trusting its results at high speeds.  Do not use TURBO mode in production until you have validated that specific unit.
+
+### How to enable TURBO mode
+
+1. Open `Firmware/LogicAnalyzer_V2/LogicAnalyzer_Build_Settings.cmake` and change:
+   ```cmake
+   set(TURBO_MODE 1)
+   ```
+2. Delete the old build directory and rebuild from scratch (the cached CMake configuration must be regenerated):
+   ```bash
+   rm -rf Firmware/LogicAnalyzer_V2/build_pico_debug_stack
+   mkdir Firmware/LogicAnalyzer_V2/build_pico_debug_stack
+   cd Firmware/LogicAnalyzer_V2/build_pico_debug_stack
+   PICO_SDK_PATH=~/.pico-sdk cmake ..
+   PICO_SDK_PATH=~/.pico-sdk make -j$(nproc)
+   ```
+3. Flash the resulting `LogicAnalyzer.uf2` to U1 as normal.
+
+### How to validate a board at high speed
+
+Use a known-good signal source (e.g. a function generator, or the Debug Probe U2 toggling a GPIO) and compare blast captures against the expected waveform at progressively higher sample rates:
+
+1. Start at **200 MHz** blast — confirm the waveform looks correct.
+2. Step up to **300 MHz** — compare again.
+3. Step up to **400 MHz** — if the waveform is still clean and consistent across multiple captures, the board passes at that rate.
+
+Signs of an unstable overclock: glitches in otherwise clean signals, intermittent USB disconnects, or the device failing to enumerate after reset.  If you see any of these, drop back to the highest rate that was stable.
+
+### Intermediate frequencies
+
+If 400 MHz is unstable on a particular board but you want more than 200 MHz, you can set a custom ceiling without fully enabling TURBO_MODE.  Edit the `BUILD_PICO_DEBUG_STACK` block in [LogicAnalyzer_Board_Settings.h](Firmware/LogicAnalyzer_V2/LogicAnalyzer_Board_Settings.h):
+```c
+#ifdef TURBO_MODE
+    #define MAX_FREQ      200000000   // leave at 200 MHz
+    #define MAX_BLAST_FREQ 300000000  // try 300 MHz if 400 is unstable
+#endif
+```
+Then rebuild with `TURBO_MODE 1`.  The board will run at the lower overclocked rate without pushing all the way to 400 MHz.
+
+---
+
 ## Troubleshooting
 
 ### Device not detected by the software
@@ -230,8 +280,8 @@ GPIO 29 and GPIO 30 are **shorted together** on the PCB, so `COMPLEX_TRIGGER_OUT
 |-----------|-------|
 | Microcontroller | RP2354B (RP2350 architecture, dual Cortex-M33) |
 | Flash | 2 MB internal |
-| Max sample rate (normal) | 100 MHz |
-| Max sample rate (blast mode) | 200 MHz |
+| Max sample rate (normal) | 100 MHz (200 MHz in TURBO mode) |
+| Max sample rate (blast mode) | 200 MHz (400 MHz in TURBO mode — board-dependent) |
 | Capture buffer | 384 KB |
 | Channels | 24 (DUT GPIO 0–22, 26–28) |
 | Trigger types | Simple, complex, fast (via GPIO 29/30 loopback) |
